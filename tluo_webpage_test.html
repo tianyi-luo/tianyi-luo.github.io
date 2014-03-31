@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8 />
+<title>Global Shale Gas Water Risk Atlas Demo</title>
+
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+<script src='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox.js/v1.6.2/mapbox.css' rel='stylesheet' />
+
+<style>
+  body { margin:0; padding:0; }
+  #map { position:absolute; top:0; bottom:0; width:100%; }
+</style>
+</head>
+<body>
+
+
+<div id='map'></div>
+
+<script src='http://code.jquery.com/jquery-1.9.1.min.js'></script>
+
+<script>
+var map = L.map('map').setView([0, 0], 2);
+// Add a base map switch function
+L.control.layers({
+    'Baseline Water Stress': L.tileLayer('http://{s}.tiles.mapbox.com/v3/tluo.r3ipy14i/{z}/{x}/{y}.png').addTo(map),
+    'Terrain': L.tileLayer('http://api.tiles.mapbox.com/v3/examples.map-20v6611k/{z}/{x}/{y}.png')
+    },{},{
+    position: 'topright'
+}).addTo(map);
+
+// Add a scale on the map
+L.control.scale().addTo(map);
+
+
+var url = 'https://api.github.com/repos/tianyi-luo/geoJSON/contents/test.geojson?ref=master';
+function load() {
+    $.ajax({
+    headers: {
+      'Accept': 'application/vnd.github.v3.raw'
+    },
+    dataType: 'json',
+    url: url,
+    success: function(geojson) {
+        var featureLayer = L.mapbox.featureLayer(geojson)
+                            .addTo(map)                   
+        featureLayer.eachLayer(function(layer){
+        var content = '<h1>' + '<\/h1>' + '<h2><font size="2" color="grey" face="Arial"><small>DISPUTED AREA: </small></font>'
+                      + '<font size="2" color="black" face="Tahoma">' + layer.feature.properties.BRK_NAME + '</font>' + '<\/h2>' +
+                      '<h3><font size="2" color="grey" face="Arial"><small>SOVEREIGN: </small></font>'
+                      + '<font size="2" color="black" face="Tahoma">' + layer.feature.properties.title + '</font>' + '<\/h3>';
+        layer.bindPopup(content,{closeButton: true});
+        });
+    }
+  });
+}
+$(load);
+</script>
+<div style="color:#0000FF"><h3>This is a heading in a div element</h3><p>This is some text in a div element.</p></div>
+
+
+
+
+</body>
+</html>
